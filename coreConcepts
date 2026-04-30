@@ -1,0 +1,35 @@
+Kafka Topics : as categories of data — like orders, payments, user events.
+
+Partitions: 
+- topic with 3 partitions — this is important because partitions control parallelism
+- Kafka scalability comes from partitions, not from consumers.
+- means Kafka can process data in parallel
+
+Consumers/Consumer Groups in the SAME group:
+- Consumer group helps scale ONE service horizontally.
+- kafka will divide work between them
+- Inside a group, Kafka does load balancing.
+- Kafka does not send messages to consumers — it assigns partitions.
+
+Producer : 
+
+Kafka : Kafka automatically redistributes the load
+- Kafka duplicates data across groups, but splits data inside a group.
+
+source / sink Connect : 
+Rebalancing — Kafka is fault tolerant, one consumer stoped 
+
+
+
+Producer sends data
+Topic stores data
+Partitions enable parallelism
+Consumer groups enable scaling
+Kafka handles failure automatically”
+
+This is exactly how real companies process millions of events in real time.
+one event is used by multiple services, and each service scales using consumer groups.
+
+
+
+Kafka Streams is a client library for building applications and microservices
