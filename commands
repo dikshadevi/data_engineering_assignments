@@ -1,0 +1,112 @@
+docker-compose up -d
+docker ps
+
+Kafka UI: http://localhost:8081
+
+
+Topic: orders
+
+Group 1: order-processing-group
+Group 2: analytics-group
+Group 3: high-value-orders-group
+Different groups = each group gets its own copy of the data
+
+
+docker exec -it kafka bash
+
+Create Kafka Topic
+
+kafka-topics \
+  --create \
+  --topic orders \
+  --bootstrap-server kafka:9092 \
+  --partitions 3 \
+  --replication-factor 1
+
+
+Check topic:
+
+kafka-topics \
+  --list \
+  --bootstrap-server kafka:9092
+
+Describe topic:
+
+kafka-topics \
+  --describe \
+  --topic orders \
+  --bootstrap-server kafka:9092
+
+Delete Topic
+
+kafka-topics \
+  --delete \
+  --topic orders \
+  --bootstrap-server kafka:9092
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+Producer:
+kafka-console-producer \
+--topic orders \
+--bootstrap-server localhost:9092
+
+CONSUMER COMMANDS
+
+Consumer:
+kafka-console-consumer --topic orders --bootstrap-server localhost:9092 --group group-1 --from-beginning
+
+
+Create Producer
+
+kafka-console-producer \
+--topic orders \
+--bootstrap-server localhost:9092
+
+Create Consumer
+
+kafka-console-consumer \
+--topic orders \
+--bootstrap-server localhost:9092 \
+--group group-1 \
+--from-beginning
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+python consumer_orders_group_a_1.py
+python consumer_orders_group_a_2.py
+python consumer_orders_group_b.py
+python consumer_high_value_orders.py
+
+python producer_orders.py
+
+
+which consumer is assigned to which partition
+docker exec -it kafka kafka-consumer-groups \
+  --bootstrap-server kafka:9092 \
+  --describe \
+  --group order-processing-group
+
+  kafka-consumer-groups \
+  --bootstrap-server kafka:9092 \
+  --describe \
+  --group analytics-group
+
+
+  kafka-consumer-groups \
+  --bootstrap-server kafka:9092 \
+  --describe \
+  --group high-value-orders-group
+
+  
+
+
+Spark job that continuously reads new messages from Kafka topic
+Run PySpark:
+  docker exec -it spark bash
+
+  
+Inside Spark container:
+/opt/spark/bin/spark-submit \
+--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1 \
+/opt/notebooks/spark_kafka_orders.py
